@@ -79,15 +79,14 @@ class HueLights { // eslint-disable-line
     const address = this.#hubAddress;
     const key = this.#apiKey;
     const lightId = this.#lightId;
-    const url = `https://${address}/api/${key}/lights/${lightId}/state`;
-    const hueCmd = on ? {on: true, ct: 250, bri: 100} : {on: false};
+    const event = on ? 'meet-meeting-started' : 'meet-meeting-ended';
+    const url = `https://maker.ifttt.com/trigger/${event}/with/key/<REPLACE-ME>`;
+
     const fetchOpts = {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(hueCmd),
+      method: 'POST',
+      mode: 'no-cors',
     };
+
     try {
       await fetch(url, fetchOpts);
     } catch (ex) {
