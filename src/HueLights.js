@@ -68,6 +68,15 @@ class HueLights { // eslint-disable-line
   }
 
   /**
+   * Delay for a promise
+   * @param {number} ms delay in ms
+   * @return {Promise<unknown>}
+   */
+  wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
    * Turn the Hue light on or off
    *
    * @param {boolean} on Light state
@@ -88,7 +97,8 @@ class HueLights { // eslint-disable-line
     };
 
     try {
-      await fetch(url, fetchOpts);
+      const DELAY_MS = on ? 0 : 3000;
+      await this.wait(DELAY_MS).then(() => fetch(url, fetchOpts));
     } catch (ex) {
       console.error('Unable to toggle Hue light.', ex);
     }
