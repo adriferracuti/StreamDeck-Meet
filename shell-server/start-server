@@ -1,0 +1,6 @@
+#!/bin/bash -eu
+PORT=6780
+dir=$(dirname $0)
+
+echo "Starting shell-server on port ${PORT}..."
+/usr/local/bin/php -S 0.0.0.0:${PORT} "${dir}/shell-server.php" || echo "Error, not started."; exit 1

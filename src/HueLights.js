@@ -57,7 +57,6 @@ class HueLights { // eslint-disable-line
     return this.#ready;
   }
 
-
   /**
    * The lights should be turned on/off automatically.
    *
@@ -77,30 +76,27 @@ class HueLights { // eslint-disable-line
   }
 
   /**
-   * Turn the Hue light on or off
-   *
-   * @param {boolean} on Light state
+   * @param {boolean} on state
    */
   async on(on) {
     if (!this.#ready) {
       return;
     }
-    const address = this.#hubAddress;
-    const key = this.#apiKey;
-    const lightId = this.#lightId;
+
+    const action = on ? 'startObs' : 'killObs';
+    const localApiUrl = `http://localhost:6780/?action=${action}`;
+    await fetch(localApiUrl, {method: 'GET', mode: 'no-cors'});
+
     const event = on ? 'meet-meeting-started' : 'meet-meeting-ended';
-    const url = `https://maker.ifttt.com/trigger/${event}/with/key/<REPLACE-ME>`;
-
-    const fetchOpts = {
-      method: 'POST',
-      mode: 'no-cors',
-    };
-
+    const iftttUrl = `https://maker.ifttt.com/trigger/${event}/with/key/<REPLACE-ME>`;
+    // delaying turning off the cam to make sure that no app is using it,
+    // thus giving it time to reposition the mirror, I guess
+    const DELAY_MS = on ? 0 : 3000;
     try {
-      const DELAY_MS = on ? 0 : 3000;
-      await this.wait(DELAY_MS).then(() => fetch(url, fetchOpts));
+      await this.wait(DELAY_MS)
+          .then(() => fetch(iftttUrl, {method: 'POST', mode: 'no-cors'}));
     } catch (ex) {
-      console.error('Unable to toggle Hue light.', ex);
+      console.error('Unable to toggle Smart Plug and/or OBS.', ex);
     }
   }
 }
