@@ -1,5 +1,5 @@
 #!/bin/bash
-/Applications/OBS.app/Contents/MacOS/obs --startvirtualcam &> ./log &
+/Applications/OBS.app/Contents/MacOS/obs --startvirtualcam --minimize-to-tray &> ./log &
 OBS_PID=$!
 echo $OBS_PID
 exit 0
