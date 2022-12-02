@@ -1,0 +1,17 @@
+#!/bin/bash -eu
+runningObsPids=$(/opt/homebrew/bin/pidof obs)
+
+if [[ -n "$runningObsPids" ]]; then
+  echo "Killing running OBS | Start"
+  kill -9 "$runningObsPids"
+  echo "Killing running OBS | Done"
+fi;
+
+echo "Launching OBS in the background..."
+open -a obs --args --startvirtualcam --minimize-to-tray 1> /dev/null &
+
+echo "Turning on the switch | Start"
+/opt/homebrew/bin/hass-cli service call --arguments entity_id=switch.fotocamera_canon switch.turn_on 1> /dev/null
+echo "Turning on the switch | Done"
+
+exit 0

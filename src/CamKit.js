@@ -80,21 +80,7 @@ class CamKit { // eslint-disable-line
     if (!this.#ready) {
       return;
     }
-
-    const action = on ? 'startObs' : 'killObs';
-    const localApiUrl = `http://localhost:6780/?action=${action}`;
+    const localApiUrl = `http://localhost:6780/?action=${(on ? 'start-cam-kit' : 'stop-cam-kit')}`;
     await fetch(localApiUrl, {method: 'GET', mode: 'no-cors'});
-
-    const event = on ? 'meet-meeting-started' : 'meet-meeting-ended';
-    const iftttUrl = `https://maker.ifttt.com/trigger/${event}/with/key/${this.#iftttToken}`;
-    // delaying turning off the cam to make sure that no app is using it,
-    // thus giving it time to reposition the mirror, I guess
-    const DELAY_MS = on ? 0 : 3000;
-    try {
-      await this.wait(DELAY_MS)
-          .then(() => fetch(iftttUrl, {method: 'POST', mode: 'no-cors'}));
-    } catch (ex) {
-      console.error('Unable to toggle Smart Plug and/or OBS.', ex);
-    }
   }
 }
