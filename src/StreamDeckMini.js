@@ -31,6 +31,9 @@ class StreamDeckMini { // eslint-disable-line
     // All rooms
     'light-off': -1,
     'light-on': -1,
+    'fullscreen-on': -1,
+    'fullscreen-off': -1,
+    'fullscreen-disabled': -1,
 
     // Lobby
     'start-instant': 6,

@@ -3,4 +3,6 @@ PORT=6780
 dir=$(dirname $0)
 
 echo "Starting shell-server on port ${PORT}..."
-/usr/local/bin/php -S 0.0.0.0:${PORT} "${dir}/shell-server.php" || echo "Error, not started."; exit 1
+
+# it must be an absolute path, otherwise it won't work on Mac via Automator
+/opt/homebrew/bin/php -S 0.0.0.0:${PORT} "${dir}/shell-server.php" || echo "Error, not started."; exit 1

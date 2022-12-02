@@ -67,36 +67,30 @@ class HueLights { // eslint-disable-line
   }
 
   /**
-   * Delay for a promise
-   * @param {number} ms delay in ms
-   * @return {Promise<unknown>}
-   */
-  wait(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  /**
-   * @param {boolean} on state
+   * Turn the Hue light on or off
+   *
+   * @param {boolean} on Light state
    */
   async on(on) {
     if (!this.#ready) {
       return;
     }
-
-    const action = on ? 'startObs' : 'killObs';
-    const localApiUrl = `http://localhost:6780/?action=${action}`;
-    await fetch(localApiUrl, {method: 'GET', mode: 'no-cors'});
-
-    const event = on ? 'meet-meeting-started' : 'meet-meeting-ended';
-    const iftttUrl = `https://maker.ifttt.com/trigger/${event}/with/key/<REPLACE-ME>`;
-    // delaying turning off the cam to make sure that no app is using it,
-    // thus giving it time to reposition the mirror, I guess
-    const DELAY_MS = on ? 0 : 3000;
+    const address = this.#hubAddress;
+    const key = this.#apiKey;
+    const lightId = this.#lightId;
+    const url = `https://${address}/api/${key}/lights/${lightId}/state`;
+    const hueCmd = on ? {on: true, ct: 250, bri: 100} : {on: false};
+    const fetchOpts = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(hueCmd),
+    };
     try {
-      await this.wait(DELAY_MS)
-          .then(() => fetch(iftttUrl, {method: 'POST', mode: 'no-cors'}));
+      await fetch(url, fetchOpts);
     } catch (ex) {
-      console.error('Unable to toggle Smart Plug and/or OBS.', ex);
+      console.error('Unable to toggle Hue light.', ex);
     }
   }
 }

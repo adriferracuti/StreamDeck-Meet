@@ -7,6 +7,7 @@
     {
       "matches": ["https://meet.google.com/*"],
       "js": [
+        "CamKit.js",
         "CanvasToBMP.js",
         "HueLights.js",
         "StreamDeck.js",

@@ -8,16 +8,18 @@ Fork of [StreamDeck-Meet](https://github.com/petele/StreamDeck-Meet) that adds s
 
 ## Steps
 
-1. Install PHP 8.x
+1. Install PHP 8.x (`brew install php`) and APC (`pecl install apcu`)
 2. Install and configure OBS
-3. Add `shell-server/start-server` to the start up (see next paragraph). The server will run on port 6780.
+3. Add `shell-server/start-server` to the start-up (see next paragraph). The server will run on port 6780.
 4. Connect the Elgato Stream Deck
-5. Replace `REPLACE-ME` in `HueLights.js` with your IFTTT key
-6. Load the extension on Chrome
+5. Load the extension on Chrome 
+6. Go to meet.google.com and run `window.localStorage["camKit"] = '{"iftttToken":"<ifttt-token>"}'`
+
 
 ## Add start-server to start up on Mac
 
-1. Automator -> "Run Shell Script" `<repo-path>/shell-server/start-server &> /dev/null &` (redirection to /dev/null needed, otherwise gets stuck)
+
+1. Automator -> Application -> "Run Shell Script" `<repo-path>/shell-server/start-server &> /dev/null &` (redirection to /dev/null needed, otherwise gets stuck)
 2. Export to application folder
 3. Add app to login items
 

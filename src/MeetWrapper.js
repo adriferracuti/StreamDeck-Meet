@@ -32,13 +32,16 @@ class MeetWrapper { // eslint-disable-line
   #streamDeck;
   #hueLights;
 
+  #camKit;
+
   /**
    * Constructor
    *
-   * @param {HIDDevice} streamDeck
-   * @param {HueHelper} hueLights
+   * @param {StreamDeck} streamDeck
+   * @param {HueLights} hueLights
+   * @param {CamKit} camKit
    */
-  constructor(streamDeck, hueLights) {
+  constructor(streamDeck, hueLights, camKit) {
     this.#streamDeck = streamDeck;
     this.#streamDeck.addEventListener('keydown', (evt) => {
       this.#handleStreamDeckPress(evt.detail.buttonId);
@@ -46,6 +49,10 @@ class MeetWrapper { // eslint-disable-line
 
     if (hueLights?.isAvailable) {
       this.#hueLights = hueLights;
+    }
+
+    if (camKit?.isAvailable) {
+      this.#camKit = camKit;
     }
 
     window.addEventListener('fullscreenchange', () => {
@@ -102,9 +109,7 @@ class MeetWrapper { // eslint-disable-line
     this.#drawButton(`start-next`);
     this.#drawButton(`start-instant`);
 
-    if (this.#hueLights?.auto) {
-      this.#hueLights.on(false);
-    }
+    this.#toggleHueAndCamKit(false)
   }
 
   /**
@@ -131,9 +136,14 @@ class MeetWrapper { // eslint-disable-line
       this.#setupGreenRoomCamButton();
     }, 500);
 
+    this.#toggleHueAndCamKit(true)
+  }
+
+  #toggleHueAndCamKit(value) {
     if (this.#hueLights?.auto) {
-      this.#hueLights.on(true);
+      this.#hueLights.on(value);
     }
+    this.#camKit?.on(value);
   }
 
   /**
@@ -172,9 +182,7 @@ class MeetWrapper { // eslint-disable-line
       this.#tapCloseInfoDialog();
     }, 10 * 1000);
 
-    if (this.#hueLights?.auto) {
-      this.#hueLights.on(true);
-    }
+    this.#toggleHueAndCamKit(true)
   }
 
   /**
@@ -193,9 +201,7 @@ class MeetWrapper { // eslint-disable-line
     this.#drawButton(`rejoin`);
     this.#drawButton(`home`);
 
-    if (this.#hueLights?.auto) {
-      this.#hueLights.on(false);
-    }
+    this.#toggleHueAndCamKit(false)
   }
 
 

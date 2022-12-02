@@ -7,9 +7,7 @@
 const CACHE_KEY = 'obs_pid';
 
 $action = $_GET['action'] ?? "";
-if (apcu_enabled()) {
-    echo "enabled";
-}
+
 //phpinfo();
 switch ($action) {
     case "startObs":
