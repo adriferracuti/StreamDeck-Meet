@@ -4,11 +4,11 @@ echo "Turning off the switch | Start"
 /opt/homebrew/bin/hass-cli service call --arguments entity_id=switch.fotocamera_canon switch.turn_off 1> /dev/null
 echo "Turning off the switch | Done"
 
-runningObsPids=$(/opt/homebrew/bin/pidof obs)
-if [[ -n "$runningObsPids" ]]; then
-  echo "Killing OBS | Start"
-  kill -9 "$runningObsPids"
-  echo "Killing OBS | Done"
-fi;
+#runningObsPids=$(/opt/homebrew/bin/pidof obs)
+#if [[ -n "$runningObsPids" ]]; then
+#  echo "Killing OBS | Start"
+#  kill -9 "$runningObsPids"
+#  echo "Killing OBS | Done"
+#fi;
 
 exit 0
