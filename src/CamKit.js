@@ -81,6 +81,6 @@ class CamKit { // eslint-disable-line
       return;
     }
     const localApiUrl = `http://localhost:6780/?action=${(on ? 'start-cam-kit' : 'stop-cam-kit')}`;
-    await fetch(localApiUrl, {method: 'GET', mode: 'no-cors'});
+    fetch(localApiUrl, {method: 'GET', mode: 'no-cors'});
   }
 }
