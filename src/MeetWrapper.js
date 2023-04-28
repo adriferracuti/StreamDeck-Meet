@@ -47,7 +47,7 @@ class MeetWrapper { // eslint-disable-line
     if (camKit?.isAvailable) {
       this.#camKit = camKit;
     }
-    
+
     window.addEventListener('fullscreenchange', () => {
       this.#drawFullScreenButton();
     });
@@ -129,9 +129,6 @@ class MeetWrapper { // eslint-disable-line
   }
 
   #toggleCamKit(value) {
-    if (this.#hueLights?.auto) {
-      this.#hueLights.on(value);
-    }
     this.#camKit?.on(value);
   }
 
@@ -188,7 +185,7 @@ class MeetWrapper { // eslint-disable-line
     this.#drawFullScreenButton();
     this.#drawButton(`rejoin`);
     this.#drawButton(`home`);
-    
+
     this.#toggleCamKit(false)
   }
 
