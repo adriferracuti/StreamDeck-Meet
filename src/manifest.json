@@ -1,6 +1,6 @@
 {
   "name": "StreamDeck-Meet",
-  "version": "0.80",
+  "version": "0.84",
   "description": "StreamDeck helper for Google Meet",
   "manifest_version": 3,
   "content_scripts": [
@@ -9,7 +9,6 @@
       "js": [
         "CamKit.js",
         "CanvasToBMP.js",
-        "HueLights.js",
         "StreamDeck.js",
         "StreamDeckMini.js",
         "StreamDeckV1.js",

@@ -30,31 +30,24 @@ class MeetWrapper { // eslint-disable-line
   };
 
   #streamDeck;
-  #hueLights;
-
   #camKit;
 
   /**
    * Constructor
    *
-   * @param {StreamDeck} streamDeck
-   * @param {HueLights} hueLights
+   * @param {HIDDevice} streamDeck
    * @param {CamKit} camKit
    */
-  constructor(streamDeck, hueLights, camKit) {
+  constructor(streamDeck, camKit) {
     this.#streamDeck = streamDeck;
     this.#streamDeck.addEventListener('keydown', (evt) => {
       this.#handleStreamDeckPress(evt.detail.buttonId);
     });
 
-    if (hueLights?.isAvailable) {
-      this.#hueLights = hueLights;
-    }
-
     if (camKit?.isAvailable) {
       this.#camKit = camKit;
     }
-
+    
     window.addEventListener('fullscreenchange', () => {
       this.#drawFullScreenButton();
     });
@@ -104,12 +97,10 @@ class MeetWrapper { // eslint-disable-line
     console.log('*SD-Meet*', 'Room:', this.#currentRoom);
 
     this.#resetButtons();
-    this.#drawHueButtons();
     this.#drawFullScreenButton();
     this.#drawButton(`start-next`);
     this.#drawButton(`start-instant`);
-
-    this.#toggleHueAndCamKit(false)
+    this.#toggleCamKit(false)
   }
 
   /**
@@ -123,7 +114,6 @@ class MeetWrapper { // eslint-disable-line
     console.log('*SD-Meet*', 'Room:', this.#currentRoom);
 
     this.#resetButtons();
-    this.#drawHueButtons();
     this.#drawFullScreenButton();
     this.#drawButton(`enter-meeting`);
     this.#drawButton(`home`);
@@ -135,11 +125,10 @@ class MeetWrapper { // eslint-disable-line
       this.#setupGreenRoomMicButton();
       this.#setupGreenRoomCamButton();
     }, 500);
-
-    this.#toggleHueAndCamKit(true)
+    this.#toggleCamKit(true)
   }
 
-  #toggleHueAndCamKit(value) {
+  #toggleCamKit(value) {
     if (this.#hueLights?.auto) {
       this.#hueLights.on(value);
     }
@@ -157,7 +146,6 @@ class MeetWrapper { // eslint-disable-line
     console.log('*SD-Meet*', 'Room:', this.#currentRoom);
 
     this.#resetButtons();
-    this.#drawHueButtons();
     this.#drawFullScreenButton();
     this.#drawButton(`end-call`);
 
@@ -174,6 +162,7 @@ class MeetWrapper { // eslint-disable-line
       this.#setupChatButton();
       this.#setupActivitiesButton();
       this.#setupPresentingButton();
+      this.#setupReactionButton();
     }, 500);
 
     // If it was an instant meeting, automatically close
@@ -182,7 +171,7 @@ class MeetWrapper { // eslint-disable-line
       this.#tapCloseInfoDialog();
     }, 10 * 1000);
 
-    this.#toggleHueAndCamKit(true)
+    this.#toggleCamKit(true)
   }
 
   /**
@@ -196,12 +185,11 @@ class MeetWrapper { // eslint-disable-line
     console.log('*SD-Meet*', 'Room:', this.#currentRoom);
 
     this.#resetButtons();
-    this.#drawHueButtons();
     this.#drawFullScreenButton();
     this.#drawButton(`rejoin`);
     this.#drawButton(`home`);
-
-    this.#toggleHueAndCamKit(false)
+    
+    this.#toggleCamKit(false)
   }
 
 
@@ -217,17 +205,7 @@ class MeetWrapper { // eslint-disable-line
    * @param {number} buttonId Button ID of the button that was pressed.
    */
   #handleStreamDeckPress(buttonId) {
-    // Hue light buttons, used in all rooms.
-    if (this.#hueLights) {
-      if (buttonId === this.#streamDeck.buttonNameToId('light-on')) {
-        this.#hueLights.on(true);
-        return;
-      }
-      if (buttonId === this.#streamDeck.buttonNameToId('light-off')) {
-        this.#hueLights.on(false);
-        return;
-      }
-    }
+    console.log('*SD-Meet*', 'Button Pressed', buttonId);
 
     // Toggle full screen, used in all rooms.
     if (buttonId === this.#streamDeck.buttonNameToId('fullscreen-on')) {
@@ -262,7 +240,9 @@ class MeetWrapper { // eslint-disable-line
 
     // Available while in the meeting room.
     if (this.#currentRoom === this.#ROOM_NAMES.meeting) {
-      if (buttonId === this.#streamDeck.buttonNameToId('info')) {
+      if (buttonId === this.#streamDeck.buttonNameToId('reaction')) {
+        this.#tapReactions();
+      } else if (buttonId === this.#streamDeck.buttonNameToId('info')) {
         this.#tapInfo();
       } else if (buttonId === this.#streamDeck.buttonNameToId('users')) {
         this.#tapUsers();
@@ -324,17 +304,6 @@ class MeetWrapper { // eslint-disable-line
       return;
     }
     this.#streamDeck.clearAllButtons();
-  }
-
-  /**
-   * Draw buttons for Hue
-   */
-  #drawHueButtons() {
-    if (!this.#hueLights) {
-      return;
-    }
-    this.#drawButton(`light-on`);
-    this.#drawButton(`light-off`);
   }
 
   /**
@@ -495,6 +464,21 @@ class MeetWrapper { // eslint-disable-line
   }
 
   /**
+   * Setup the meeting room send a reaction button.
+   */
+  #setupReactionButton() {
+    const button = this.#getReactionButton();
+    if (!button) {
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this.#updateReactionButton();
+    });
+    observer.observe(button, {attributeFilter: ['aria-pressed']});
+    this.#updateReactionButton();
+  }
+
+  /**
    * Setup the green room mic button.
    */
   #setupGreenRoomMicButton() {
@@ -646,6 +630,19 @@ class MeetWrapper { // eslint-disable-line
   }
 
   /**
+   * Update the StreamDeck Send a Reaction button to indicate current state.
+   */
+  #updateReactionButton() {
+    const button = this.#getReactionButton();
+    if (!button) {
+      return;
+    }
+    const newVal = button.getAttribute('aria-pressed') == 'true';
+    const img = newVal ? 'reaction-open' : 'reaction';
+    this.#drawButton(img);
+  }
+
+  /**
    * Update the StreamDeck mic button (green room) to indicate current state.
    */
   #updateGreenRoomMicButton() {
@@ -741,7 +738,7 @@ class MeetWrapper { // eslint-disable-line
    * @return {?Element}
    */
   #getMicButton() {
-    const sel = '[jscontroller=t8kvj]';
+    const sel = '[jscontroller=t2mBxb]';
     return document.querySelector(sel)?.querySelector('button');
   }
 
@@ -751,7 +748,7 @@ class MeetWrapper { // eslint-disable-line
    * @return {?Element}
    */
   #getCamButton() {
-    const sel = '[jscontroller=DXtw0b]';
+    const sel = '[jscontroller=vuC9df]';
     return document.querySelector(sel)?.querySelector('button');
   }
 
@@ -761,7 +758,7 @@ class MeetWrapper { // eslint-disable-line
    * @return {?Element}
    */
   #getCCButton() {
-    const sel = '[jscontroller=U1Cub]';
+    const sel = '[jscontroller=iBwifb]';
     return document.querySelector(sel)?.querySelector('button');
   }
 
@@ -822,6 +819,37 @@ class MeetWrapper { // eslint-disable-line
    */
   #getActivitiesButton() {
     const sel = '[data-panel-id="10"]';
+    return document.querySelector(sel);
+  }
+
+  /**
+   * Gets the Send a reaction button in the meeting room.
+   *
+   * @return {?Element}
+   */
+  #getReactionButton() {
+    const sel = '[jscontroller=aTG8jc]';
+    return document.querySelector(sel)?.querySelector('button');
+  }
+
+  /**
+   * Gets the Send a reaction bar in the meeting room.
+   *
+   * @return {?Element}
+   */
+  #getReactionBar() {
+    const sel = '[jscontroller=tdX73b]';
+    return document.querySelector(sel);
+  }
+
+  /**
+   * Gets the send a reaction emoji button in the meeting room.
+   *
+   * @param {string} emoji Emoji to find
+   * @return {?Element}
+   */
+  #getReactionEmojiButton(emoji) {
+    const sel = `[aria-label=${emoji}]`;
     return document.querySelector(sel);
   }
 
@@ -1014,6 +1042,14 @@ class MeetWrapper { // eslint-disable-line
   #tapActivities() {
     const button = this.#getActivitiesButton();
     this.#tapButtonWrapper(button, 'activities');
+  }
+
+  /**
+   * Taps the Send a reaction button, to toggle reaction panel (meeting room).
+   */
+  #tapReactions() {
+    const button = this.#getReactionButton();
+    this.#tapButtonWrapper(button, 'reactions');
   }
 
   /**

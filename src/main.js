@@ -16,9 +16,8 @@
 
 'use strict';
 
-/* global MeetWrapper, StreamDeck, HueLights */
+/* global MeetWrapper, StreamDeck */
 
-const hueLights = new HueLights();
 const camKit = new CamKit();
 const streamDeck = new StreamDeck();
 const sdConnectButtonID = 'streamDeckHelperConnect';
@@ -28,7 +27,7 @@ const sdConnectButtonID = 'streamDeckHelperConnect';
  * Adds a Connect to StreamDeck button to the page.
  */
 function addConnectButton() {
-  if (window.location.pathname !== '/') {
+  if (window.location.pathname !== '/' && window.location.pathname !== '/landing') {
     return;
   }
   const elem = document.createElement('button');
@@ -56,7 +55,7 @@ function startWrapper() {
     if (elem) {
       elem.remove();
     }
-    new MeetWrapper(streamDeck, hueLights, camKit);
+    new MeetWrapper(streamDeck, camKit);
     return true;
   }
   addConnectButton();
