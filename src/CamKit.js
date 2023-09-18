@@ -80,7 +80,7 @@ class CamKit { // eslint-disable-line
     if (!this.#ready) {
       return;
     }
-    const localApiUrl = `http://localhost:6780/?action=${(on ? 'start-cam-kit' : 'stop-cam-kit')}`;
+    const localApiUrl = `http://localhost:6780/shell-server.php?action=${(on ? 'start-cam-kit' : 'stop-cam-kit')}`;
     fetch(localApiUrl, {method: 'GET', mode: 'no-cors'});
   }
 }
